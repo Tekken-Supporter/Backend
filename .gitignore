@@ -131,3 +131,5 @@ dist
 
 # KEY 파일 제외
 KEY
+rootca.crt
+rootca.key
