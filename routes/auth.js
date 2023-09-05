@@ -37,7 +37,7 @@ router.post('/login',async(req,res)=>{
                 })
             }
             //요청 정상 수행
-            if(results[0].isUser){
+            if(results[0] !== undefined){
                 const token = generateToken(results[0]);
                 return res.status(200).json({
                     token : token
