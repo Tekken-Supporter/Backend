@@ -10,6 +10,12 @@ router.get('/',async(req,res)=>{
     });
 });
 
+function generateToken (user){
+    require('dotenv').config();
+    return jwt.sign({ name: user.name, id: user.id, password: user.password}, process.env.SECRETTOKEN, { expiresIn: '30 days' });
+  };
+  
+
 //로그인
 router.post('/login',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
