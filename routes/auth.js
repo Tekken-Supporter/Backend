@@ -46,7 +46,9 @@ router.post('/login',async(req,res)=>{
             if(results[0] !== undefined){
                 const token = generateToken(results[0]);
                 return res.status(200).json({
-                    token : token
+                    "status": "ok",
+                    "message": "User logged in success.",
+                    "token" : token
                 })
             }
             //해당하는 사용자가 없는 경우 에러 처리
@@ -89,19 +91,26 @@ router.post('/register',async(req,res)=>{
         connection.query(SQL,[id,password,name],function(err, results, field){
             if(err){
                 console.error(err);
-                return res.status(401).json({
-                    error: err
+                return res.status(400).json({
+                    "type": "/errors/incorrect-SQL-pass",
+                    "title": "Incorrect query or SQL disconnect.",
+                    "status": 400,
+                    "detail": err.toString()
                 })
             }
             console.log(results);
             return res.status(200).json({
-                success: true
+                "status": "ok",
+                "message": "User register success.",
             })
         })
     }
     catch(err){
-        return res.status(400).json({
-            error: err
+        return res.status(500).json({
+            "type": "/errors/incorrect-server-pass",
+            "title": "Internal Server Error.",
+            "status": 500,
+            "detail": err.toString()
         });
     }
 });
