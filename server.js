@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const fs = require('fs');
+const cors = require('cors');
 
 //const HTTP_PORT = 80;
 //const HTTPS_PORT = 443;
@@ -13,19 +14,20 @@ const authRouter = require('./routes/auth');
 
 app.use(bodyParser.json());
 
-app.use('/auth',authRouter);
-
-
-db.connect();
-
-
-const cors = require('cors');
 let corsOptions = {
     origin: ['*', 'null'],
     credentials: true
 }
 
 app.use(cors(corsOptions));
+
+app.use('/auth',authRouter);
+
+
+db.connect();
+
+
+
 
 /*
 const httpsOptions = {
