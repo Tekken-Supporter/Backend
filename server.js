@@ -27,8 +27,6 @@ app.use('/auth',authRouter);
 db.connect();
 
 
-
-
 /*
 const httpsOptions = {
     key: fs.readFileSync('./rootca.key'),
@@ -43,3 +41,8 @@ app.get('/', (req, res) => {
 app.listen(port, ()=>{
     console.log(`server is listening at localhost:${port}`);
 })
+
+const maintain_connect = setInterval(()=>{
+    const connection = db.return_connection();
+    connection.query("SELECT 1");
+},360000)
