@@ -3,6 +3,7 @@ const app = express();
 const port = 3000;
 const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
 
 //const HTTP_PORT = 80;
 //const HTTPS_PORT = 443;
@@ -34,8 +35,15 @@ const httpsOptions = {
 }
 */
 
+
+
 app.get('/', (req, res) => {
-    res.json({ message: `Server is running on port ${port}` });
+    res.header("Access-Control-Allow-Origin", "*");
+
+    res.status(200).json({
+        success: true
+    })
+    //res.sendFile(__dirname + "/Frontend/main.html");
 });
 
 app.listen(port, ()=>{
