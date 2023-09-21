@@ -12,6 +12,7 @@ const path = require('path');
 const db = require('./db');
 const bodyParser = require('body-parser');
 const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
 const characterRouter = require('./routes/character');
 
 app.use(bodyParser.json());
@@ -25,7 +26,7 @@ app.use(cors(corsOptions));
 
 app.use('/auth', authRouter);
 app.use('/character', characterRouter);
-
+app.use('/user', userRouter);
 
 db.connect();
 
