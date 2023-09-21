@@ -89,9 +89,9 @@ router.post('/register',async(req,res)=>{
         const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
         const name = req.body.name;
 
-        const  SQL = "insert into userinfo values (?,?,?);";
+        const  SQL = "insert into userinfo values (?,?,?,?,?);";
 
-        connection.query(SQL,[id,hash_password,name],function(err, results, field){
+        connection.query(SQL,[name,id,hash_password, "Lee", "Tier4"],function(err, results, field){
             if(err){
                 console.error(err.toString());
                 return res.status(400).json({
