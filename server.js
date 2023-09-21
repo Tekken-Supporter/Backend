@@ -12,6 +12,7 @@ const path = require('path');
 const db = require('./db');
 const bodyParser = require('body-parser');
 const authRouter = require('./routes/auth');
+const characterRouter = require('./routes/character');
 
 app.use(bodyParser.json());
 
@@ -22,7 +23,8 @@ let corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use('/auth',authRouter);
+app.use('/auth', authRouter);
+app.use('/character', characterRouter);
 
 
 db.connect();
@@ -46,11 +48,11 @@ app.get('/', (req, res) => {
     //res.sendFile(__dirname + "/Frontend/main.html");
 });
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`server is listening at localhost:${port}`);
 })
 
-const maintain_connect = setInterval(()=>{
+const maintain_connect = setInterval(() => {
     const connection = db.return_connection();
     connection.query("SELECT 1");
-},360000)
+}, 360000)
