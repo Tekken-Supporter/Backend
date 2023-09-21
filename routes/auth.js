@@ -31,14 +31,14 @@ router.post('/login',async(req,res)=>{
         //DB 연결용 connection 변수 선언
         const connection = db.return_connection();
         //해당 정보에 해당하는 사용자가 있는 지 확인하는 쿼리문
-        const  SQL = "Select * from user where id = ? and password = ?;";
+        const  SQL = "Select * from userinfo where id = ? and password = ?;";
 
         //유저 정보 확인용 쿼리 요청
         connection.query(SQL,[id,hash_password],function(err, results, field){
             //Query 요청 중 에러 발생 시
             if(err){
                 console.error(err);
-                return res.status(500).json({
+                return res.status(400).json({
                     "type": "/errors/incorrect-SQL-pass",
                     "title": "Incorrect query or SQL disconnect.",
                     "status": 400,
@@ -89,7 +89,7 @@ router.post('/register',async(req,res)=>{
         const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
         const name = req.body.name;
 
-        const  SQL = "insert into user values (?,?,?);";
+        const  SQL = "insert into userinfo values (?,?,?);";
 
         connection.query(SQL,[id,hash_password,name],function(err, results, field){
             if(err){
