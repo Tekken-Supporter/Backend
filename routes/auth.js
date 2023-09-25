@@ -58,7 +58,7 @@ router.post('/login',async(req,res)=>{
             else {
                 console.error("Authentication failed due to incorrect username or password.");
                 return res.status(401).json({
-                    "type": "/errors/incorrect-user-pass",
+                    "type": "/errors/incorrect-auth-pass",
                     "title": "Incorrect username or password.",
                     "status": 401,
                     "detail": "Authentication failed due to incorrect username or password.",
@@ -126,7 +126,7 @@ router.post('/register',async(req,res)=>{
             else{
                 console.error("User register failed due to duplicate user id.");
                 return res.status(401).json({
-                    "type": "/errors/incorrect-user-pass",
+                    "type": "/errors/incorrect-auth-pass",
                     "title": "Duplicate user id.",
                     "status": 401,
                     "detail": "User register failed due to duplicate user id.",
