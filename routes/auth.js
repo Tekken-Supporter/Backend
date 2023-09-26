@@ -48,7 +48,7 @@ router.post('/login',async(req,res)=>{
             //요청 정상 수행
             if(results[0] !== undefined){
                 const token = generateToken(results[0].id, results[0].name);
-                return res.status(200).json({
+                return res.status(201).json({
                     "status": "ok",
                     "message": "User logged in success.",
                     "token" : token
@@ -116,7 +116,7 @@ router.post('/register',async(req,res)=>{
                         })
                     }
 
-                    return res.status(200).json({
+                    return res.status(201).json({
                         "status": "ok",
                         "message": "User register success.",
                     })
@@ -125,13 +125,64 @@ router.post('/register',async(req,res)=>{
 
             else{
                 console.error("User register failed due to duplicate user id.");
-                return res.status(401).json({
+                return res.status(400).json({
                     "type": "/errors/incorrect-auth-pass",
                     "title": "Duplicate user id.",
-                    "status": 401,
+                    "status": 400,
                     "detail": "User register failed due to duplicate user id.",
                 })
             }
+        })
+        
+    }
+    catch(err){
+        console.error(err.toString());
+        return res.status(500).json({
+            "type": "/errors/incorrect-server-pass",
+            "title": "Internal Server Error.",
+            "status": 500,
+            "detail": err.toString()
+        });
+    }
+});
+
+//회원가입
+router.post('/checkid/:id',async(req,res)=>{
+    res.header("Access-Control-Allow-Origin", "*");
+
+    try{
+        const connection = db.return_connection();
+
+        const id = req.params.id;
+
+        const SQL1 = "Select * from userinfo where id = ?;";
+
+        connection.query(SQL1,[id],function(err,results,field){
+            if(err){
+                console.error(err.toString());
+                return res.status(400).json({
+                    "type": "/errors/incorrect-SQL-pass",
+                    "title": "Incorrect query or SQL disconnect.",
+                    "status": 400,
+                    "detail": err.toString()
+                })
+            }
+
+            if(results[0] === undefined){
+                return res.status(201).json({
+                    "status": "ok",
+                    "message": "Not duplicate id.",
+                })
+            }
+            else {
+                return res.status(400).json({
+                    "type": "/errors/incorrect-auth-pass",
+                    "title": "Duplicate id",
+                    "status": 400,
+                    "detail": err.toString()
+                })
+            }
+            
         })
 
         
