@@ -48,7 +48,7 @@ router.post('/login',async(req,res)=>{
             //요청 정상 수행
             if(results[0] !== undefined){
                 const token = generateToken(results[0].id, results[0].name);
-                return res.status(200).json({
+                return res.status(201).json({
                     "status": "ok",
                     "message": "User logged in success.",
                     "token" : token
@@ -116,7 +116,7 @@ router.post('/register',async(req,res)=>{
                         })
                     }
 
-                    return res.status(200).json({
+                    return res.status(201).json({
                         "status": "ok",
                         "message": "User register success.",
                     })
@@ -125,15 +125,14 @@ router.post('/register',async(req,res)=>{
 
             else{
                 console.error("User register failed due to duplicate user id.");
-                return res.status(401).json({
+                return res.status(400).json({
                     "type": "/errors/incorrect-auth-pass",
                     "title": "Duplicate user id.",
-                    "status": 401,
+                    "status": 400,
                     "detail": "User register failed due to duplicate user id.",
                 })
             }
         })
-
         
     }
     catch(err){
@@ -170,7 +169,7 @@ router.post('/checkid/:id',async(req,res)=>{
             }
 
             if(results[0] === undefined){
-                return res.status(200).json({
+                return res.status(201).json({
                     "status": "ok",
                     "message": "Not duplicate id.",
                 })
