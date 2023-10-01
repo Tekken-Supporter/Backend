@@ -146,7 +146,7 @@ router.post('/register',async(req,res)=>{
     }
 });
 
-//회원가입
+//중복 id 체크
 router.post('/checkid/:id',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
