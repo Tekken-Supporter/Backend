@@ -51,7 +51,12 @@ router.post('/login',async(req,res)=>{
                 return res.status(201).json({
                     "status": "ok",
                     "message": "User logged in success.",
-                    "token" : token
+                    "token" : token,
+                    "name": results[0].name,
+                    "id": results[0].id,
+                    "champion": results[0].champion,
+                    "tier": results[0].tier,
+                    "winrate": results[0].winrate
                 })
             }
             //해당하는 사용자가 없는 경우 에러 처리
@@ -116,7 +121,7 @@ router.post('/register',async(req,res)=>{
                         })
                     }
 
-                    return res.status(201).json({
+                    return res.status(200).json({
                         "status": "ok",
                         "message": "User register success.",
                     })
