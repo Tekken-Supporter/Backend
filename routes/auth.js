@@ -103,7 +103,7 @@ router.post('/register',async(req,res)=>{
             }
 
             if(results[0] === undefined){
-                const SQL = "insert into userinfo values (?,?,?,?,?);";
+                const SQL = "insert into userinfo (name,id,password,champion,tier) values (?,?,?,?,?);";
 
                 connection.query(SQL,[name,id,hash_password, null, "Tier4"],function(err, results, field){
                     if(err){
