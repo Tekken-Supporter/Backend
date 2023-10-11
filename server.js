@@ -1,35 +1,47 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+const fs = require('fs');
+const cors = require('cors');
+const path = require('path');
 
+//const HTTP_PORT = 80;
+//const HTTPS_PORT = 443;
+//const https = require('https');
 
 const db = require('./db');
 const bodyParser = require('body-parser');
 const authRouter = require('./routes/auth');
+const userRouter = require('./routes/user');
+const characterRouter = require('./routes/character');
 
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname ,"..","Frontend")));
 
-app.use('/auth',authRouter);
+let corsOptions = {
+    origin: ['*', 'null','http://localhost:3000'],
+    credentials: true
+}
 
+app.use(cors(corsOptions));
+
+app.use('/auth', authRouter);
+app.use('/character', characterRouter);
+app.use('/user', userRouter);
 
 db.connect();
 
-/*
-const cors = require('cors');
-let corsOptions = {
-    origin: ['http://localhost:3005', 'http://34.168.80.42:3005', 'http://34.125.167.160', 'http://34.168.167.2:5000', 'http://localhost:5000'],
-    credentials: true
-}
-app.use(cors(corsOptions));
-*/
-
-app.get('/', async(req,res) => {
+app.get('/', (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.status(200).json({
-        sucess: true
-    })
-})
 
-app.listen(port, ()=>{
+    res.sendFile(path.join(__dirname,"..","Frontend","main.html"));
+});
+
+app.listen(port, () => {
     console.log(`server is listening at localhost:${port}`);
 })
+
+const maintain_connect = setInterval(() => {
+    const connection = db.return_connection();
+    connection.query("SELECT 1");
+}, 360000)
