@@ -17,9 +17,10 @@ const characterRouter = require('./routes/character');
 const rankingRouter = require('./routes/ranking');
 
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname ,"..","Frontend")));
 
 let corsOptions = {
-    origin: ['*', 'null'],
+    origin: ['*', 'null','http://localhost:3000'],
     credentials: true
 }
 
@@ -32,23 +33,10 @@ app.use('/ranking', rankingRouter);
 
 db.connect();
 
-
-/*
-const httpsOptions = {
-    key: fs.readFileSync('./rootca.key'),
-    cert: fs.readFileSync('./rootca.crt')
-}
-*/
-
-
-
 app.get('/', (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
 
-    res.status(200).json({
-        success: true
-    })
-    //res.sendFile(__dirname + "/Frontend/main.html");
+    res.sendFile(path.join(__dirname,"..","Frontend","main.html"));
 });
 
 app.listen(port, () => {
