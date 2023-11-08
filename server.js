@@ -15,6 +15,7 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const characterRouter = require('./routes/character');
 const rankingRouter = require('./routes/ranking');
+const challengeRouter = require('./routes/challenge');
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname ,"..","Frontend")));
@@ -30,6 +31,7 @@ app.use('/auth', authRouter);
 app.use('/character', characterRouter);
 app.use('/user', userRouter);
 app.use('/ranking', rankingRouter);
+app.use('/chellenge',challengeRouter )
 
 db.connect();
 
