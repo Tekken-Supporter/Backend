@@ -15,7 +15,7 @@ router.get('/',async(req,res)=>{
 function generateToken (user){
     require('dotenv').config();
 
-    return jwt.sign({ name: user.name, id: user.id, password: user.password}, process.env.SECRETTOKEN, { expiresIn: '30 days' });
+    return jwt.sign({ name: user.name, id: user.id}, process.env.SECRETTOKEN, { expiresIn: '30 days' });
   };
   
 
@@ -47,7 +47,7 @@ router.post('/login',async(req,res)=>{
             }
             //요청 정상 수행
             if(results[0] !== undefined){
-                const token = generateToken(results[0].id, results[0].name);
+                const token = generateToken(results[0]);
                 return res.status(201).json({
                     "status": "ok",
                     "message": "User logged in success.",
