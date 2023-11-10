@@ -133,3 +133,4 @@ dist
 KEY
 rootca.crt
 rootca.key
+test.js
