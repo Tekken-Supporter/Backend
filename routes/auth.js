@@ -22,7 +22,6 @@ function generateToken (user){
 //로그인
 router.post('/login',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
-    console.log("login");
     try{
 
         //아이디와 비밀번호 저장

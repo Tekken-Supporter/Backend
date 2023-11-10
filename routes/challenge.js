@@ -16,12 +16,12 @@ router.post('/apply',async(req,res)=>{
     try{
         const challenger = req.body.challenger;
         const defender = req.body.defender;
-        const matchDate = req.body.matchDate;
+        const applyMessage = req.body.applyMessage;
 
-        const SQL = "INSERT INTO challenge (challenger, defender, matchDate) values (?,?,?);";
+        const SQL = "INSERT INTO challenge (challenger, contender, applyMessage) values (?,?,?);";
         const connection = await db.return_connection();
 
-        connection.query(SQL,[challenger,defender,matchDate],function(err,results,field){
+        connection.query(SQL,[challenger,defender,matchDate,applyMessage],function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
@@ -56,7 +56,7 @@ router.get('/check/:id',async(req,res)=>{
     try{
 
         const user_id = req.params.id;
-        const SQL = "Select * from challenge where challenger = (SELECT name from userinfo where id = ?) or defender = (SELECT name from userinfo where id = ?);";
+        const SQL = "Select * from challenge where challenger = (SELECT name from userinfo where id = ?) or contender = (SELECT name from userinfo where id = ?) order BY challenge_id;";
         const connection = await db.return_connection();
 
         connection.query(SQL,[user_id, user_id],function(err,results,field){
@@ -69,10 +69,18 @@ router.get('/check/:id',async(req,res)=>{
                     "detail": err.toString()
                 })
             }
+
+            const challenge_list = [];
+
+            results.foreach((challenge)=>{
+                //if(challenge.challenger === )
+            })
         })
 
         res.status(200).json({
-            message: "챌린지 확인"
+            status: 200,
+            message: "챌린지 확인",
+
         });
     }
     catch(e){
