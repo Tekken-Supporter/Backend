@@ -4,11 +4,6 @@ const db = require('../db.js');
 
 router.get('/', async(req,res)=> {
     res.header("Access-Control-Allow-Origin", "*");
-    // const connection = db.return_connection();//DB 연결용 connection 변수 선언
-    // connection.query('SELECT GROUP_CONCAT(DISTINCT name ORDER BY name) AS name, CASE WHEN tier = "Currrent_King" THEN "current_king" WHEN tier = "Zate_Keeper" THEN "gatekeeper" ELSE tier END AS tier FROM userinfo GROUP BY tier;', (error, rows) => {
-    //     if (error) throw error;
-    //     res.json(rows);
-    // });
 
     try{
         const SQL = "SELECT GROUP_CONCAT(DISTINCT name ORDER BY name) AS name, CASE WHEN tier = 'Currrent_King' THEN 'current_king' WHEN tier = 'Zate_Keeper' THEN 'gatekeeper' ELSE tier END AS tier FROM userinfo GROUP BY tier;";
@@ -40,11 +35,6 @@ router.get('/', async(req,res)=> {
 
 router.get('/rank', async(req,res)=> {
     res.header("Access-Control-Allow-Origin", "*");
-    // const connection = db.return_connection();//DB 연결용 connection 변수 선언
-    // connection.query(`select name,id,champion,tier,winrate from userinfo order by tier limit 10`, (error, rows) => {
-    //     if (error) throw error;
-    //     res.json(rows);
-    // });
 
     try{
         const SQL = "select name,id,champion,tier,winrate from userinfo order by tier limit 10;";
