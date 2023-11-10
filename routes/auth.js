@@ -15,15 +15,15 @@ router.get('/',async(req,res)=>{
 function generateToken (user){
     require('dotenv').config();
 
-    return jwt.sign({ name: user.name, id: user.id, password: user.password}, process.env.SECRETTOKEN, { expiresIn: '30 days' });
+    return jwt.sign({ name: user.name, id: user.id}, process.env.SECRETTOKEN, { expiresIn: '30 days' });
   };
   
 
 //로그인
 router.post('/login',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
-
     try{
+
         //아이디와 비밀번호 저장
         const id = req.body.id;
         const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
@@ -45,10 +45,12 @@ router.post('/login',async(req,res)=>{
                     "detail": err.toString()
                 })
             }
+
             //요청 정상 수행
             if(results[0] !== undefined){
-                const token = generateToken(results[0].id, results[0].name);
-                return res.status(201).json({
+                const token = generateToken(results[0]);
+
+                return res.status(200).json({
                     "status": "ok",
                     "message": "User logged in success.",
                     "token" : token,

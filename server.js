@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname ,"..","Frontend")));
 
 let corsOptions = {
-    origin: ['*', 'null','http://localhost:3000'],
+    origin: ['null', '*', 'http://localhost:3000','http://localhost:5500'],
     credentials: true
 }
 
