@@ -24,6 +24,9 @@ router.post('/login',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
     try{
+
+        console.log(req.body);
+
         //아이디와 비밀번호 저장
         const id = req.body.id;
         const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
@@ -45,9 +48,12 @@ router.post('/login',async(req,res)=>{
                     "detail": err.toString()
                 })
             }
+
+            console.log(results[0]);
             //요청 정상 수행
             if(results[0] !== undefined){
                 const token = generateToken(results[0]);
+                console.log(token);
                 return res.status(201).json({
                     "status": "ok",
                     "message": "User logged in success.",
