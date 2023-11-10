@@ -134,11 +134,12 @@ router.route('/review')//review 기능 CRUD
         const id = req.body.id;
         const reviewData = req.body.reviewData;
         const creationTime = new Date();
+        const modifiedTime = new Date();
     
-        const SQL = "INSERT INTO review (c_name, id, reviewData, CreationTime) values (?,?,?,?);";
+        const SQL = "INSERT INTO review (c_name, id, reviewData, CreationTime, modifiedTime) values (?,?,?,?,?);";
         const connection = db.return_connection();//DB 연결용 connection 변수 선언
     
-        connection.query(SQL,[c_name,id,reviewData, creationTime],function(err,results,field){
+        connection.query(SQL,[c_name,id,reviewData, creationTime, modifiedTime],function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
@@ -221,7 +222,7 @@ router.route('/review')//review 기능 CRUD
     try {
         const number = parseInt(req.body.number);
         const reviewData = req.body.reviewData;
-        const creationTime = new Date();
+        const modifiedTime = new Date();
 
         if (!number) {
             return res.status(400).json({
@@ -232,10 +233,10 @@ router.route('/review')//review 기능 CRUD
             });
         }
 
-        const SQL = "UPDATE review SET reviewData = ?, creationTime = ? WHERE number = ?";
+        const SQL = "UPDATE review SET reviewData = ?, modifiedTime = ? WHERE number = ?";
         const connection = db.return_connection();
 
-        connection.query(SQL, [reviewData, creationTime, number], function (err, results, field) {
+        connection.query(SQL, [reviewData, modifiedTime, number], function (err, results, field) {
             if (err) {
                 console.error(err);
                 return res.status(400).json({
