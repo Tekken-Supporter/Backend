@@ -170,8 +170,8 @@ router.route('/review')//review 기능 CRUD
     res.header("Access-Control-Allow-Origin", "*");
 
     try {
-        const reviewNumber = req.body.reviewNumber;
-        if (!reviewNumber || isNaN(parseInt(reviewNumber))) {
+        const number = req.body.number;
+        if (!number || isNaN(parseInt(number))) {
             return res.status(400).json({
                 "type": "/errors/invalid-review-number",
                 "title": "Invalid Review Number",
@@ -183,7 +183,7 @@ router.route('/review')//review 기능 CRUD
         const SQL = "DELETE FROM review WHERE number = ?";
         const connection = db.return_connection();
 
-        connection.query(SQL, [parseInt(reviewNumber)], function (err, results, field) {
+        connection.query(SQL, [parseInt(number)], function (err, results, field) {
             if (err) {
                 console.error(err);
                 return res.status(400).json({
@@ -199,7 +199,7 @@ router.route('/review')//review 기능 CRUD
                     "type": "/errors/review-not-found",
                     "title": "Review Not Found",
                     "status": 404,
-                    "detail": `Review with number ${reviewNumber} not found.`
+                    "detail": `Review with number ${number} not found.`
                 });
             }
 
@@ -219,10 +219,11 @@ router.route('/review')//review 기능 CRUD
     res.header("Access-Control-Allow-Origin", "*");
 
     try {
-        const reviewNumber = parseInt(req.params.reviewNumber);
-        const { c_name, id, reviewData, creationTime } = req.body;
+        const number = parseInt(req.body.number);
+        const reviewData = req.body.reviewData;
+        const creationTime = new Date();
 
-        if (!reviewNumber) {
+        if (!number) {
             return res.status(400).json({
                 "type": "/errors/missing-review-number",
                 "title": "Missing Review Number",
@@ -231,10 +232,10 @@ router.route('/review')//review 기능 CRUD
             });
         }
 
-        const SQL = "UPDATE review SET c_name = ?, id = ?, reviewData = ?, creationTime = ? WHERE id = ?";
+        const SQL = "UPDATE review SET reviewData = ?, creationTime = ? WHERE number = ?";
         const connection = db.return_connection();
 
-        connection.query(SQL, [c_name, id, reviewData, creationTime, reviewNumber], function (err, results, field) {
+        connection.query(SQL, [reviewData, creationTime, number], function (err, results, field) {
             if (err) {
                 console.error(err);
                 return res.status(400).json({
@@ -250,7 +251,7 @@ router.route('/review')//review 기능 CRUD
                     "type": "/errors/review-not-found",
                     "title": "Review Not Found",
                     "status": 404,
-                    "detail": `Review with ID ${reviewNumber} not found.`
+                    "detail": `Review with ID ${number} not found.`
                 });
             }
 
