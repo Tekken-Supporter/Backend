@@ -86,17 +86,19 @@ router.put('/updateinfo/:id',async(req,res)=>{
         //const token = req.headers.authorization.split(' ')[1];
 
         const id = req.params.id;
-        const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
+        const now_hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
+        const new_hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
         const name = req.body.name;
         const champion = req.body.champion;
         
         //DB 연결용 connection 변수 선언
         const connection = db.return_connection();
+
         //해당 정보에 해당하는 사용자가 있는 지 확인하는 쿼리문
-        const  SQL = "update userinfo set password = ?, name = ?, champion = ? where id = ?;";
+        const SQL = "update userinfo set password = ?, name = ?, champion = ? where id = ? and password = ?;";
 
         //유저 정보 확인용 쿼리 요청
-        connection.query(SQL,[hash_password, name, champion, id],function(err, results, field){
+        connection.query(SQL,[new_hash_password, name, champion, id, now_hash_password],function(err, results, field){
             //Query 요청 중 에러 발생 시
             if(err){
                 console.error(err);
@@ -112,17 +114,16 @@ router.put('/updateinfo/:id',async(req,res)=>{
             if(reulsts[0].affectedRows === 1){
                 return res.status(200).json({
                     "status": "ok",
+                    "check": "yes",
                     "message": "Query Success",
                 })
             }
 
             else{
-                console.error(err);
-                return res.status(400).json({
-                    "type": "/errors/incorrect-SQL-pass",
-                    "title": "Incorrect userid or body-data.",
-                    "status": 400,
-                    "detail": err.toString()
+                return res.status(200).json({
+                    "status": "ok",
+                    "check": "no",
+                    "message": "Query Success",
                 })
             }
 
