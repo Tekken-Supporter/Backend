@@ -77,24 +77,29 @@ router.route('/review')//review 기능 CRUD
         const c_name = req.body.c_name;
         const id = req.body.id;
         const reviewData = req.body.reviewData;
-        const startDate = req.query.startDate; // Add startDate and endDate parameters
+        const startDate = req.query.startDate;
         const endDate = req.query.endDate;
 
         let SQL = "SELECT * FROM review";
 
-        const conditions = [];
+        const conditions = [];//add 'conditions' array(prevent SQL injection)
+        const parameters = [];
 
         if (c_name) {
-            conditions.push(`c_name = '${c_name}'`);
+            conditions.push('c_name = ?');
+            parameters.push(c_name);
         }
         if (id) {
-            conditions.push(`id = '${id}'`);
+            conditions.push('id = ?');
+            parameters.push(id);
         }
         if (reviewData) {
-            conditions.push(`reviewData LIKE '%${reviewData}%'`);
+            conditions.push('reviewData LIKE ?');
+            parameters.push(reviewData);
         }
         if (startDate && endDate) {
-            conditions.push(`creationTime BETWEEN '${startDate}' AND '${endDate}'`);
+            conditions.push('creationTime BETWEEN ? AND ?');
+            parameters.push(startDate, endDate);
         }
 
         if (conditions.length > 0) {
@@ -103,7 +108,7 @@ router.route('/review')//review 기능 CRUD
 
         const connection = db.return_connection();//DB 연결용 connection 변수 선언
     
-        connection.query(SQL,function(err,results,field){
+        connection.query(SQL,parameters,function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
