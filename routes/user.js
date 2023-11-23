@@ -97,7 +97,7 @@ router.put('/updateinfo/:id',async(req,res)=>{
         const SQL = "update userinfo set password = ?, champion = ? where id = ? and password = ?;";
 
         //유저 정보 확인용 쿼리 요청
-        connection.query(SQL,[new_hash_password, name, champion, id, now_hash_password],function(err, results, field){
+        connection.query(SQL,[new_hash_password, champion, id, now_hash_password],function(err, results, field){
             //Query 요청 중 에러 발생 시
             if(err){
                 console.error(err);
