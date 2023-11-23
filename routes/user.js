@@ -86,16 +86,15 @@ router.put('/updateinfo/:id',async(req,res)=>{
         //const token = req.headers.authorization.split(' ')[1];
 
         const id = req.params.id;
-        const now_hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
-        const new_hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
-        const name = req.body.name;
+        const now_hash_password = crypto.createHash('sha512').update(req.body.nowpassword).digest('base64');
+        const new_hash_password = crypto.createHash('sha512').update(req.body.newpassword).digest('base64');
         const champion = req.body.champion;
         
         //DB 연결용 connection 변수 선언
         const connection = db.return_connection();
 
         //해당 정보에 해당하는 사용자가 있는 지 확인하는 쿼리문
-        const SQL = "update userinfo set password = ?, name = ?, champion = ? where id = ? and password = ?;";
+        const SQL = "update userinfo set password = ?, champion = ? where id = ? and password = ?;";
 
         //유저 정보 확인용 쿼리 요청
         connection.query(SQL,[new_hash_password, name, champion, id, now_hash_password],function(err, results, field){
@@ -123,7 +122,7 @@ router.put('/updateinfo/:id',async(req,res)=>{
                 return res.status(200).json({
                     "status": "ok",
                     "check": "no",
-                    "message": "Query Success",
+                    "message": "wrong now password",
                 })
             }
 
