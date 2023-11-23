@@ -110,7 +110,7 @@ router.put('/updateinfo/:id',async(req,res)=>{
             }
 
             //컬럼을 수정했다면 
-            if(results[0].affectedRows === 1){
+            if(results.affectedRows === 1){
                 return res.status(200).json({
                     "status": "ok",
                     "check": "yes",
