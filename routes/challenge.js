@@ -32,7 +32,7 @@ router.post('/apply',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                status: 200,
+                status: "ok",
                 message: "챌린지 신청 완료"
             });
         })
@@ -72,7 +72,7 @@ router.post('/accept',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                status: 200,
+                status: "ok",
                 message: "챌린지 수락 완료"
             });
         })
@@ -126,7 +126,7 @@ router.post('/modifydate',async(req,res)=>{
                         })
                     }
                     return res.status(200).json({
-                        status: 200,
+                        status: "ok",
                         message: "매치 날짜 수정 완료"
                     })
                 })  
@@ -146,7 +146,7 @@ router.post('/modifydate',async(req,res)=>{
                         })
                     }
                     return res.status(200).json({
-                        status: 200,
+                        status: "ok",
                         message: "매치 날짜 수정 완료"
                     })
                 })  
@@ -189,7 +189,7 @@ router.post('/confirmdate',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                status: 200,
+                status: "ok",
                 message: "챌린지 수락 완료"
             });
         })
@@ -230,7 +230,7 @@ router.get('/check/:id/:name',async(req,res)=>{
             }
 
             return res.status(200).json({
-                status:200,
+                status: "ok",
                 message: "도전 요청 리스트",
                 challengeList: results.map((challenge)=>{
                     //challenger인 경우
