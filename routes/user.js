@@ -148,8 +148,11 @@ router.get('/match/:id',async(req,res)=>{
         const user_id = req.params.id;
 
         const connection = await db.return_connection();
-        const SQL = "SELECT * FROM matches where loser = (SELECt name from userinfo where id = ?) OR winner = (SELECt name from userinfo where id = ?) ORDER BY match_id LIMIT 10;";
-
+        
+        let SQL = "select match_id, ifnull(loser,challenger) as loser, ifnull(winner,contender) as winner, losescore, winscore, challenger, contender, applymessage, creationDate from matches ";
+        SQL += "left join challenge on match_id = challenge_id";
+        SQL += "where contender = (select name from userinfo where id = ?) or challenger = (select name from userinfo where id = ?) order by matchDate desc;";        
+ 
         connection.query(SQL, [user_id, user_id], function(err,results,field){
             if(err){
                 console.error(err);
@@ -161,7 +164,9 @@ router.get('/match/:id',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                results
+                status: "ok",
+                message: "유저 최근 전적",
+                matchlist: results
             })
         })
     }
