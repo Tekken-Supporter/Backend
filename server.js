@@ -31,7 +31,7 @@ app.use('/auth', authRouter);
 app.use('/character', characterRouter);
 app.use('/user', userRouter);
 app.use('/ranking', rankingRouter);
-app.use('/chellenge',challengeRouter )
+app.use('/challenge',challengeRouter )
 
 db.connect();
 

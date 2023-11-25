@@ -86,17 +86,18 @@ router.put('/updateinfo/:id',async(req,res)=>{
         //const token = req.headers.authorization.split(' ')[1];
 
         const id = req.params.id;
-        const hash_password = crypto.createHash('sha512').update(req.body.password).digest('base64');
-        const name = req.body.name;
+        const now_hash_password = crypto.createHash('sha512').update(req.body.nowpassword).digest('base64');
+        const new_hash_password = crypto.createHash('sha512').update(req.body.newpassword).digest('base64');
         const champion = req.body.champion;
         
         //DB 연결용 connection 변수 선언
         const connection = db.return_connection();
+
         //해당 정보에 해당하는 사용자가 있는 지 확인하는 쿼리문
-        const  SQL = "update userinfo set password = ?, name = ?, champion = ? where id = ?;";
+        const SQL = "update userinfo set password = ?, champion = ? where id = ? and password = ?;";
 
         //유저 정보 확인용 쿼리 요청
-        connection.query(SQL,[hash_password, name, champion, id],function(err, results, field){
+        connection.query(SQL,[new_hash_password, champion, id, now_hash_password],function(err, results, field){
             //Query 요청 중 에러 발생 시
             if(err){
                 console.error(err);
@@ -109,20 +110,19 @@ router.put('/updateinfo/:id',async(req,res)=>{
             }
 
             //컬럼을 수정했다면 
-            if(reulsts[0].affectedRows === 1){
+            if(results.affectedRows === 1){
                 return res.status(200).json({
                     "status": "ok",
+                    "check": "yes",
                     "message": "Query Success",
                 })
             }
 
             else{
-                console.error(err);
-                return res.status(400).json({
-                    "type": "/errors/incorrect-SQL-pass",
-                    "title": "Incorrect userid or body-data.",
-                    "status": 400,
-                    "detail": err.toString()
+                return res.status(200).json({
+                    "status": "ok",
+                    "check": "no",
+                    "message": "wrong now password",
                 })
             }
 
@@ -148,8 +148,11 @@ router.get('/match/:id',async(req,res)=>{
         const user_id = req.params.id;
 
         const connection = await db.return_connection();
-        const SQL = "SELECT * FROM matches where loser = (SELECt name from userinfo where id = ?) OR winner = (SELECt name from userinfo where id = ?) ORDER BY match_id LIMIT 10;";
-
+        
+        let SQL = "select match_id, ifnull(loser,challenger) as loser, ifnull(winner,contender) as winner, losescore, winscore, challenger, contender, applymessage, creationDate from matches ";
+        SQL += "left join challenge on match_id = challenge_id";
+        SQL += "where contender = (select name from userinfo where id = ?) or challenger = (select name from userinfo where id = ?) order by matchDate desc;";        
+ 
         connection.query(SQL, [user_id, user_id], function(err,results,field){
             if(err){
                 console.error(err);
@@ -161,7 +164,9 @@ router.get('/match/:id',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                results
+                status: "ok",
+                message: "유저 최근 전적",
+                matchlist: results
             })
         })
     }

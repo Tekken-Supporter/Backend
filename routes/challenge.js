@@ -9,6 +9,73 @@ router.get('/',async(req,res)=>{
     });
 });
 
+//챌린지 신청 가능 목록
+router.get('/name/:id',async(req,res)=>{
+    res.header("Access-Control-Allow-Origin", "*");
+
+    try{
+        const user_id = req.params.id;
+
+        const SQL = "Select tier from userinfo where id = ?;";
+        const connection = await db.return_connection();
+
+        connection.query(SQL,[user_id],function(err,results,field){
+            if(err){
+                console.error(err);
+                return res.status(400).json({
+                    "type": "/errors/incorrect-SQL-pass",
+                    "title": "Incorrect query or SQL disconnect.",
+                    "status": 400,
+                    "detail": err.toString()
+                })
+            }
+
+            const tier = results[0].tier;
+
+            if(tier === "Current_King"){
+                return res.status(200).json({
+                    status: "ok",
+                    message: "챔피언은 방어전 수락만 가능합니다.",
+                    namelist: []
+                });
+            }
+            else{
+                const tierlist = ["Current_King", "Tier1", "Tier2", "Tier3", "Tier4", "Zate_Keeper"];
+            
+                const SQL2 = "Select group_concat(name) as name from userinfo where tier = ?;";
+
+                connection.query(SQL2,[tierlist[tierlist.indexOf(tier)-1]],function(err,results,field){
+                    if(err){
+                        console.error(err);
+                        return res.status(400).json({
+                            "type": "/errors/incorrect-SQL-pass",
+                            "title": "Incorrect query or SQL disconnect.",
+                            "status": 400,
+                            "detail": err.toString()
+                        })
+                    }
+                    const namelist = results[0].name.split(',');
+                    return res.status(200).json({
+                        status: "ok",
+                        message: "챌린지 신청 가능 목록",
+                        namelist: namelist
+                    })
+                })
+            }
+        })
+
+    }
+    catch(e){
+        console.error(e.toString());
+        return res.status(500).json({
+            "type": "/errors/incorrect-server-pass",
+            "title": "Internal Server Error.",
+            "status": 500,
+            "detail": err.toString()
+        })
+    }
+});
+
 //챌린지 신청
 router.post('/apply',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
@@ -17,11 +84,13 @@ router.post('/apply',async(req,res)=>{
         const challenger = req.body.challenger;
         const contender = req.body.contender;
         const applymessage = req.body.applymessage;
+        const matchDate = req.body.matchdate;
+        const creationDate = new Date();
 
-        const SQL = "INSERT INTO challenge (challenger, contender, applymessage) values (?,?,?);";
+        const SQL = "INSERT INTO challenge (challenger, contender, applymessage, matchDate, creationDate) values (?,?,?,?,?);";
         const connection = await db.return_connection();
 
-        connection.query(SQL,[challenger,contender,applymessage],function(err,results,field){
+        connection.query(SQL,[challenger,contender,applymessage,matchDate,creationDate],function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
@@ -32,7 +101,7 @@ router.post('/apply',async(req,res)=>{
                 })
             }
             return res.status(200).json({
-                status: 200,
+                status: "ok",
                 message: "챌린지 신청 완료"
             });
         })
@@ -50,18 +119,17 @@ router.post('/apply',async(req,res)=>{
 });
 
 //챌린지 수락
-router.post('/accept',async(req,res)=>{
+router.get('/accept/:id',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
     try{
         const challenge_id = req.body.challenge_id;
-        const acceptmessage = req.body.acceptmessage;
-        const matchDate = req.body.matchDate;
 
-        const SQL = "update table_name challenge set check1=1, check3 = 1, acceptmessage=?, matchDate = ? where challenge_id=?;";
+        const SQL = "update table_name challenge set check1 = 1 where challenge_id=?;";
+        const SQL2 = "insert into matches (match_id, loser, winner, winscore, losescore) values (?, ?, ?, ?, ?)"
         const connection = await db.return_connection();
 
-        connection.query(SQL,[acceptmessage, matchDate, challenge_id],function(err,results,field){
+        connection.query(SQL,[challenge_id, null, null, 0, 0],function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
@@ -71,12 +139,65 @@ router.post('/accept',async(req,res)=>{
                     "detail": err.toString()
                 })
             }
+            connection.query(SQL2,[challenge_id, null, null, 0, 0],function(err,results,field){
+                if(err){
+                    console.error(err);
+                    return res.status(400).json({
+                        "type": "/errors/incorrect-SQL-pass",
+                        "title": "Incorrect query or SQL disconnect.",
+                        "status": 400,
+                        "detail": err.toString()
+                    })
+                }
+                return res.status(200).json({
+                    status: "ok",
+                    message: "챌린지 수락 완료"
+                });
+            })
+            
+        })
+
+    }
+    catch(e){
+        console.error(e.toString());
+        return res.status(500).json({
+            "type": "/errors/incorrect-server-pass",
+            "title": "Internal Server Error.",
+            "status": 500,
+            "detail": err.toString()
+        })
+    }
+});
+
+//받은 챌린지 확인
+router.get('/check/:id',async(req,res)=>{
+    res.header("Access-Control-Allow-Origin", "*");
+
+    try{
+
+        const user_id = req.params.id;
+
+        const SQL = "Select * from challenge where contender = (Select name from userinfo where id = ?) and check1 = 1 order by challenge_id";
+
+        const connection = await db.return_connection();
+
+        connection.query(SQL,[user_id],function(err,results,field){
+            if(err){
+                console.error(err);
+                return res.status(400).json({
+                    "type": "/errors/incorrect-SQL-pass",
+                    "title": "Incorrect query or SQL disconnect.",
+                    "status": 400,
+                    "detail": err.toString()
+                })
+            }
+
             return res.status(200).json({
-                status: 200,
-                message: "챌린지 수락 완료"
-            });
+                status: "ok",
+                message: "도전 요청 리스트",
+                challengeList: results
+            })
         })
-
     }
     catch(e){
         console.error(e.toString());
@@ -89,20 +210,19 @@ router.post('/accept',async(req,res)=>{
     }
 });
 
-//날짜 수정
-router.post('/modifydate',async(req,res)=>{
+//보낸 챌린지 확인
+router.get('/send/:id',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
     try{
-        const challenge_id = req.body.challenge_id;
-        const matchDate = req.body.matchDate;
-        const user_id = req.body.id;
-        const user_name = req.body.name;
 
-        const SQL = "Select * from challenge where challenge_id;";
+        const user_id = req.params.id;
+
+        const SQL = "Select * from challenge where challenger = (Select name from userinfo where id = ?) order by challenge_id desc";
+
         const connection = await db.return_connection();
 
-        connection.query(SQL,[challenge_id,acceptmessage],function(err,results,field){
+        connection.query(SQL,[user_id],function(err,results,field){
             if(err){
                 console.error(err);
                 return res.status(400).json({
@@ -113,47 +233,12 @@ router.post('/modifydate',async(req,res)=>{
                 })
             }
 
-            if(results[0].challenger === user_name){
-                const SQL2 = "update table_name challenge set check2=1, check3=0, matchDate=? where challenge_id=?;";
-                connection.query(SQL2,[matchDate, challenge_id],function(err,results,field){
-                    if(err){
-                        console.error(err);
-                        return res.status(400).json({
-                            "type": "/errors/incorrect-SQL-pass",
-                            "title": "Incorrect query or SQL disconnect.",
-                            "status": 400,
-                            "detail": err.toString()
-                        })
-                    }
-                    return res.status(200).json({
-                        status: 200,
-                        message: "매치 날짜 수정 완료"
-                    })
-                })  
-                
-            }
-
-            else if(results[0].contender === user_name){
-                const SQL2 = "update table_name challenge set check2=0, check3=1, matchDate=? where challenge_id=?;";
-                connection.query(SQL2,[matchDate, challenge_id],function(err,results,field){
-                    if(err){
-                        console.error(err);
-                        return res.status(400).json({
-                            "type": "/errors/incorrect-SQL-pass",
-                            "title": "Incorrect query or SQL disconnect.",
-                            "status": 400,
-                            "detail": err.toString()
-                        })
-                    }
-                    return res.status(200).json({
-                        status: 200,
-                        message: "매치 날짜 수정 완료"
-                    })
-                })  
-                
-            }
+            return res.status(200).json({
+                status: "ok",
+                message: "보낸 요청 리스트",
+                challengeList: results
+            })
         })
-
     }
     catch(e){
         console.error(e.toString());
@@ -163,19 +248,27 @@ router.post('/modifydate',async(req,res)=>{
             "status": 500,
             "detail": err.toString()
         })
-    }
+    } 
 });
 
 
-//날짜 확정
-router.post('/confirmdate',async(req,res)=>{
+//챌린지 결과 확인
+router.post('/result',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
     try{
-        const challenge_id = req.body.challenge_id;
 
-        
-        const SQL = "update table_name challenge set check2=1, check3=1 where challenge_id=?;";
+        const challenge_id = req.body.challenge_id;
+        const challenger = req.body.challenger;
+        const contender = req.body.contender;
+
+        let winner;
+        let loser;
+        let winscore;
+        let losescore;
+
+        const SQL = "Select * from challenge where challenge_id = ?";
+
         const connection = await db.return_connection();
 
         connection.query(SQL,[challenge_id],function(err,results,field){
@@ -188,71 +281,35 @@ router.post('/confirmdate',async(req,res)=>{
                     "detail": err.toString()
                 })
             }
-            return res.status(200).json({
-                status: 200,
-                message: "챌린지 수락 완료"
-            });
-        })
 
-    }
-    catch(e){
-        console.error(e.toString());
-        return res.status(500).json({
-            "type": "/errors/incorrect-server-pass",
-            "title": "Internal Server Error.",
-            "status": 500,
-            "detail": err.toString()
-        })
-    }
-});
-
-//챌린지 확인
-router.get('/check/:id/:name',async(req,res)=>{
-    res.header("Access-Control-Allow-Origin", "*");
-
-    try{
-
-        const user_id = req.params.id;
-        const user_name = req.params.name;
-
-        const SQL = "Select * from challenge where challenger = (SELECT name from userinfo where id = ?) or contender = (SELECT name from userinfo where id = ?) order BY challenge_id;";
-        const connection = await db.return_connection();
-
-        connection.query(SQL,[user_id, user_id],function(err,results,field){
-            if(err){
-                console.error(err);
-                return res.status(400).json({
-                    "type": "/errors/incorrect-SQL-pass",
-                    "title": "Incorrect query or SQL disconnect.",
-                    "status": 400,
-                    "detail": err.toString()
-                })
+            if(challenger===3){
+                winner = results[0].challengr;
+                loser = results[0].contender;
+                winscore = challenger;
+                losescore = contender;
             }
-
-            return res.status(200).json({
-                status:200,
-                message: "도전 요청 리스트",
-                challengeList: results.map((challenge)=>{
-                    //challenger인 경우
-                    if(challenge.challenger === user_name){
-                        //매치 일정이 안 정해진 경우
-                        if(challenge.check1 === 1 && challenge.check2 === 0){
-                            challenge.checked = false;
-                        }
-                        else{
-                            challenge.checked = true;
-                        }
-                    }
-                    //contender인 경우
-                    else if(challenge.contender === user_name){
-                        //매치 확인이나 일정 확정을 안 한 경우
-                        if(challenge.check1 === 0 || (challenge.check1 === 1 && challenge.check3 === 0)){
-                            challenge.checked = false;
-                        }
-                        else{
-                            challenge.checked = true;
-                        }
-                    }
+            else{
+                winner = results[0].challengr;
+                loser = results[0].contender;
+                winscore = contender;
+                losescore = challenger;
+            }
+            
+            const SQL2 = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
+            
+            connection.query(SQL2, [winner,loser,winscore,losescore,challenge_id],function(err,results,field){
+                if(err){
+                    console.error(err);
+                    return res.status(400).json({
+                        "type": "/errors/incorrect-SQL-pass",
+                        "title": "Incorrect query or SQL disconnect.",
+                        "status": 400,
+                        "detail": err.toString()
+                    })
+                }
+                return res.status(200).json({
+                    status: "ok",
+                    message: "매치 결과 업데이트 완료"
                 })
             })
         })
