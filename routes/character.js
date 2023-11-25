@@ -81,8 +81,8 @@ router.route('/review')//review 기능 CRUD
         const endDate = req.query.endDate;
 
         let SQL = "SELECT * FROM review";
-
         const conditions = [];//add 'conditions' array(prevent SQL injection)
+        
         const parameters = [];
 
         if (c_name) {
