@@ -261,11 +261,8 @@ router.post('/result',async(req,res)=>{
         const challenge_id = req.body.challenge_id;
         const challenger = req.body.challenger;
         const contender = req.body.contender;
-
-        let winner;
-        let loser;
-        let winscore;
-        let losescore;
+        const score_challenger = req.body.score_challenger;
+        const score_contender = req.body.score_contender;
 
         const SQL = "Select * from challenge where challenge_id = ?";
 
@@ -282,22 +279,45 @@ router.post('/result',async(req,res)=>{
                 })
             }
 
-            if(challenger===3){
-                winner = results[0].challengr;
-                loser = results[0].contender;
-                winscore = challenger;
-                losescore = contender;
+            const SQL_array = [];
+
+            if(score_challenger===3){
+                SQL_array.push(challenger, contender, score_challenger, score_contender);
             }
             else{
-                winner = results[0].challengr;
-                loser = results[0].contender;
-                winscore = contender;
-                losescore = challenger;
+                SQL_array.push(contender, challenger, score_contender, score_challenger);
             }
             
-            const SQL2 = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
-            
-            connection.query(SQL2, [winner,loser,winscore,losescore,challenge_id],function(err,results,field){
+            /*
+            //승률 업데이트 필요
+            const SQL_UpdateTier = "update userinfo set tier = (Select tier from userifo where name = ?) where name = ?";
+            connection.query(SQL_UpdateTier, [challenger,contender] ,function(err,results,field){
+                if(err){
+                    console.error(err);
+                    return res.status(400).json({
+                        "type": "/errors/incorrect-SQL-pass",
+                        "title": "Incorrect query or SQL disconnect.",
+                        "status": 400,
+                        "detail": err.toString()
+                    })
+                }
+            })
+            connection.query(SQL_UpdateTier, [contender, challenger] ,function(err,results,field){
+                if(err){
+                    console.error(err);
+                    return res.status(400).json({
+                        "type": "/errors/incorrect-SQL-pass",
+                        "title": "Incorrect query or SQL disconnect.",
+                        "status": 400,
+                        "detail": err.toString()
+                    })
+                }
+            })
+            */
+
+            const SQL_UpdateMatch = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
+
+            connection.query(SQL_UpdateMatch, SQL_array ,function(err,results,field){
                 if(err){
                     console.error(err);
                     return res.status(400).json({
