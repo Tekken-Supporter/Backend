@@ -127,7 +127,7 @@ router.post('/accept',async(req,res)=>{
         const message = req.body.message;
 
         if(message === "accept"){
-            const SQL = "update table_name challenge set check1 = 1 where challenge_id=?;";
+            const SQL = "update challenge set check1 = 1 where challenge_id=?;";
             const SQL2 = "insert into matches (match_id, loser, winner, winscore, losescore) values (?, ?, ?, ?, ?)"
             const connection = await db.return_connection();
 
@@ -160,7 +160,7 @@ router.post('/accept',async(req,res)=>{
             })
         }
         else{
-            const SQL = "delete table_name challenge where challenge_id=?;";
+            const SQL = "delete challenge where challenge_id=?;";
             const connection = await db.return_connection();
 
             connection.query(SQL,[challenge_id],function(err,results,field){
