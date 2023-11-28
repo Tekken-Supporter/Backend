@@ -48,7 +48,7 @@ router.put('/updateWinrate/:name', async(req,res)=> {
         }
         // 디코딩된 사용자 이름
         const username = decodeURIComponent(encodedUsername);
-        
+
         // 해당 사용자의 승리, 패배, 승리한 매치의 패배 판 수, 패배한 매치의 승리 판 수를 가져오는 쿼리
         const userStatsQuery = `
             SELECT
