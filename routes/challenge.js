@@ -310,33 +310,6 @@ router.post('/result',async(req,res)=>{
             else{
                 SQL_array.push(contender, challenger, score_contender, score_challenger);
             }
-            
-            /*
-            //승률 업데이트 필요
-            const SQL_UpdateTier = "update userinfo set tier = (Select tier from userifo where name = ?) where name = ?";
-            connection.query(SQL_UpdateTier, [challenger,contender] ,function(err,results,field){
-                if(err){
-                    console.error(err);
-                    return res.status(400).json({
-                        "type": "/errors/incorrect-SQL-pass",
-                        "title": "Incorrect query or SQL disconnect.",
-                        "status": 400,
-                        "detail": err.toString()
-                    })
-                }
-            })
-            connection.query(SQL_UpdateTier, [contender, challenger] ,function(err,results,field){
-                if(err){
-                    console.error(err);
-                    return res.status(400).json({
-                        "type": "/errors/incorrect-SQL-pass",
-                        "title": "Incorrect query or SQL disconnect.",
-                        "status": 400,
-                        "detail": err.toString()
-                    })
-                }
-            })
-            */
 
             const SQL_UpdateMatch = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
 
@@ -350,6 +323,52 @@ router.post('/result',async(req,res)=>{
                         "detail": err.toString()
                     })
                 }
+
+                const updateWinrate = async function a(name){
+                    // 디코딩된 사용자 이름
+                    const username = name;
+
+                    // 해당 사용자의 승리, 패배, 승리한 매치의 패배 판 수, 패배한 매치의 승리 판 수를 가져오는 쿼리
+                    const userStatsQuery = `
+                        SELECT
+                        COALESCE(SUM(CASE WHEN winner = ? THEN winscore ELSE 0 END), 0) as wins,
+                        COALESCE(SUM(CASE WHEN loser = ? THEN losescore ELSE 0 END), 0) as losses,
+                        COALESCE(SUM(CASE WHEN winner = ? THEN losescore ELSE 0 END), 0) as win_losses,
+                        COALESCE(SUM(CASE WHEN loser = ? THEN winscore ELSE 0 END), 0) as loss_losses
+                        FROM matches
+                        WHERE winner = ? OR loser = ?;
+                    `;
+
+                    const results = await new Promise((resolve, reject) => {
+                        connection.query(userStatsQuery, [username, username, username, username, username, username], async (err, results, field) => {
+                            if (err) reject(err);
+                            else resolve(results);
+                        });
+
+                        const wins = results[0].wins;
+                        const losses = results[0].losses;
+                        const win_losses = results[0].win_losses;
+                        const loss_losses = results[0].loss_losses;
+
+                        // Winrate 계산
+                        const denominator = wins + losses + win_losses + loss_losses;
+                        const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
+
+                        // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
+                        const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
+
+                        new Promise((resolve, reject) => {
+                            connection.query(updateQuery, [winrate, username], (err, results, field) => {
+                                if (err) reject(err);
+                                else resolve();
+                            });
+                        });
+                    });
+                }
+
+                updateWinrate(challenger);
+                updateWinrate(contender);
+
                 return res.status(200).json({
                     status: "ok",
                     message: "매치 결과 업데이트 완료"
@@ -367,7 +386,6 @@ router.post('/result',async(req,res)=>{
         })
     }
 
-    
 });
 
 module.exports = router;
