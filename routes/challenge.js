@@ -119,27 +119,19 @@ router.post('/apply',async(req,res)=>{
 });
 
 //챌린지 수락
-router.get('/accept/:id',async(req,res)=>{
+router.post('/accept',async(req,res)=>{
     res.header("Access-Control-Allow-Origin", "*");
 
     try{
         const challenge_id = req.body.challenge_id;
+        const message = req.body.message;
 
-        const SQL = "update table_name challenge set check1 = 1 where challenge_id=?;";
-        const SQL2 = "insert into matches (match_id, loser, winner, winscore, losescore) values (?, ?, ?, ?, ?)"
-        const connection = await db.return_connection();
+        if(message === "accept"){
+            const SQL = "update table_name challenge set check1 = 1 where challenge_id=?;";
+            const SQL2 = "insert into matches (match_id, loser, winner, winscore, losescore) values (?, ?, ?, ?, ?)"
+            const connection = await db.return_connection();
 
-        connection.query(SQL,[challenge_id, null, null, 0, 0],function(err,results,field){
-            if(err){
-                console.error(err);
-                return res.status(400).json({
-                    "type": "/errors/incorrect-SQL-pass",
-                    "title": "Incorrect query or SQL disconnect.",
-                    "status": 400,
-                    "detail": err.toString()
-                })
-            }
-            connection.query(SQL2,[challenge_id, null, null, 0, 0],function(err,results,field){
+            connection.query(SQL,[challenge_id],function(err,results,field){
                 if(err){
                     console.error(err);
                     return res.status(400).json({
@@ -149,13 +141,40 @@ router.get('/accept/:id',async(req,res)=>{
                         "detail": err.toString()
                     })
                 }
-                return res.status(200).json({
-                    status: "ok",
-                    message: "챌린지 수락 완료"
-                });
+                connection.query(SQL2,[challenge_id, null, null, 0, 0],function(err,results,field){
+                    if(err){
+                        console.error(err);
+                        return res.status(400).json({
+                            "type": "/errors/incorrect-SQL-pass",
+                            "title": "Incorrect query or SQL disconnect.",
+                            "status": 400,
+                            "detail": err.toString()
+                        })
+                    }
+                    return res.status(200).json({
+                            status: "ok",
+                            message: "챌린지 수락 완료"
+                    });
+                    })
+                
             })
-            
-        })
+        }
+        else{
+            const SQL = "delete table_name challenge where challenge_id=?;";
+            const connection = await db.return_connection();
+
+            connection.query(SQL,[challenge_id],function(err,results,field){
+                if(err){
+                    console.error(err);
+                    return res.status(400).json({
+                        "type": "/errors/incorrect-SQL-pass",
+                        "title": "Incorrect query or SQL disconnect.",
+                        "status": 400,
+                        "detail": err.toString()
+                    })
+                }
+            })
+        }
 
     }
     catch(e){
@@ -177,7 +196,7 @@ router.get('/check/:id',async(req,res)=>{
 
         const user_id = req.params.id;
 
-        const SQL = "Select * from challenge where contender = (Select name from userinfo where id = ?) and check1 = 1 order by challenge_id";
+        const SQL = "Select * from challenge where contender = (Select name from userinfo where id = ?) and check1 = 0 order by challenge_id";
 
         const connection = await db.return_connection();
 
