@@ -160,7 +160,7 @@ router.post('/accept',async(req,res)=>{
             })
         }
         else{
-            const SQL = "delete challenge where challenge_id=?;";
+            const SQL = "delete from challenge where challenge_id=?;";
             const connection = await db.return_connection();
 
             connection.query(SQL,[challenge_id],function(err,results,field){
