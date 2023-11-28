@@ -155,7 +155,7 @@ router.post('/accept',async(req,res)=>{
                             status: "ok",
                             message: "챌린지 수락 완료"
                     });
-                    })
+                })
                 
             })
         }
@@ -173,6 +173,10 @@ router.post('/accept',async(req,res)=>{
                         "detail": err.toString()
                     })
                 }
+                return res.status(200).json({
+                    status: "ok",
+                    message: "챌린지 거절 완료"
+                });
             })
         }
 
