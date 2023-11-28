@@ -149,8 +149,8 @@ router.get('/match/:id',async(req,res)=>{
 
         const connection = await db.return_connection();
         
-        let SQL = "select match_id, ifnull(loser,challenger) as loser, ifnull(winner,contender) as winner, losescore, winscore, challenger, contender, applymessage, creationDate from matches ";
-        SQL += "left join challenge on match_id = challenge_id";
+        let SQL = "select match_id, ifnull(loser,challenger) as loser, ifnull(winner,contender) as winner, losescore, winscore, challenger, contender, applymessage, creationDate from matches  ";
+        SQL += "left join challenge on match_id = challenge_id  ";
         SQL += "where contender = (select name from userinfo where id = ?) or challenger = (select name from userinfo where id = ?) order by matchDate desc;";        
  
         connection.query(SQL, [user_id, user_id], function(err,results,field){
