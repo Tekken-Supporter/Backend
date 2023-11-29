@@ -331,24 +331,24 @@ router.post('/result',async(req,res)=>{
                         if (err) reject(err);
                         else resolve(results);
                     });
+   
+                });
+                const wins = result[0].wins;
+                const losses = result[0].losses;
+                const win_losses = result[0].win_losses;
+                const loss_losses = result[0].loss_losses;
 
-                    const wins = result[0].wins;
-                    const losses = result[0].losses;
-                    const win_losses = result[0].win_losses;
-                    const loss_losses = result[0].loss_losses;
+                // Winrate 계산
+                const denominator = wins + losses + win_losses + loss_losses;
+                const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
 
-                    // Winrate 계산
-                    const denominator = wins + losses + win_losses + loss_losses;
-                    const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
+                // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
+                const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
 
-                    // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
-                    const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
-
-                    new Promise((resolve, reject) => {
-                        connection.query(updateQuery, [winrate, username], (err, results, field) => {
-                            if (err) reject(err);
-                            else resolve();
-                        });
+                new Promise((resolve, reject) => {
+                    connection.query(updateQuery, [winrate, username], (err, results, field) => {
+                        if (err) reject(err);
+                        else resolve();
                     });
                 });
             }
