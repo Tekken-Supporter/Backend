@@ -176,7 +176,7 @@ router.route('/review')//review 기능 CRUD
     res.header("Access-Control-Allow-Origin", "*");
 
     try {
-        const number = req.body.number;
+        const number = req.query.number;
         if (!number || isNaN(parseInt(number))) {
             return res.status(400).json({
                 "type": "/errors/invalid-review-number",
