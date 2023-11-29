@@ -340,7 +340,7 @@ router.post('/result',async(req,res)=>{
 
                 // Winrate 계산
                 const denominator = wins + losses + win_losses + loss_losses;
-                const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
+                const winrate = denominator !== 0 ? (wins + losses) / denominator * 100 : 0;
 
                 // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
                 const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
