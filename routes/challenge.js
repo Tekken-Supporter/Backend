@@ -311,6 +311,58 @@ router.post('/result',async(req,res)=>{
                 SQL_array.push(contender, challenger, score_contender, score_challenger,challenge_id);
             }
 
+            const updateWinrate = async function a(name){
+                // 디코딩된 사용자 이름
+                const username = name;
+
+                // 해당 사용자의 승리, 패배, 승리한 매치의 패배 판 수, 패배한 매치의 승리 판 수를 가져오는 쿼리
+                const userStatsQuery = `
+                    SELECT
+                    COALESCE(SUM(CASE WHEN winner = ? THEN winscore ELSE 0 END), 0) as wins,
+                    COALESCE(SUM(CASE WHEN loser = ? THEN losescore ELSE 0 END), 0) as losses,
+                    COALESCE(SUM(CASE WHEN winner = ? THEN losescore ELSE 0 END), 0) as win_losses,
+                    COALESCE(SUM(CASE WHEN loser = ? THEN winscore ELSE 0 END), 0) as loss_losses
+                    FROM matches
+                    WHERE winner = ? OR loser = ?;
+                `;
+
+                const result = await new Promise((resolve, reject) => {
+                    connection.query(userStatsQuery, [username, username, username, username, username, username], async (err, results, field) => {
+                        if (err) reject(err);
+                        else resolve(results);
+                    });
+
+                    const wins = result[0].wins;
+                    const losses = result[0].losses;
+                    const win_losses = result[0].win_losses;
+                    const loss_losses = result[0].loss_losses;
+
+                    // Winrate 계산
+                    const denominator = wins + losses + win_losses + loss_losses;
+                    const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
+
+                    // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
+                    const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
+
+                    new Promise((resolve, reject) => {
+                        connection.query(updateQuery, [winrate, username], (err, results, field) => {
+                            if (err) reject(err);
+                            else resolve();
+                        });
+                    });
+                });
+            }
+
+            updateWinrate(challenger);
+            updateWinrate(contender);
+
+            /*
+            //티어 
+            const SQL_SWAP = "select tier, name from userinfo where name = ?;";
+
+            connection.query(SQL_SWAP,[])
+            */
+
             const SQL_UpdateMatch = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
 
             connection.query(SQL_UpdateMatch, SQL_array ,function(err,results,field){
@@ -324,56 +376,13 @@ router.post('/result',async(req,res)=>{
                     })
                 }
 
-                const updateWinrate = async function a(name){
-                    // 디코딩된 사용자 이름
-                    const username = name;
-
-                    // 해당 사용자의 승리, 패배, 승리한 매치의 패배 판 수, 패배한 매치의 승리 판 수를 가져오는 쿼리
-                    const userStatsQuery = `
-                        SELECT
-                        COALESCE(SUM(CASE WHEN winner = ? THEN winscore ELSE 0 END), 0) as wins,
-                        COALESCE(SUM(CASE WHEN loser = ? THEN losescore ELSE 0 END), 0) as losses,
-                        COALESCE(SUM(CASE WHEN winner = ? THEN losescore ELSE 0 END), 0) as win_losses,
-                        COALESCE(SUM(CASE WHEN loser = ? THEN winscore ELSE 0 END), 0) as loss_losses
-                        FROM matches
-                        WHERE winner = ? OR loser = ?;
-                    `;
-
-                    const results = await new Promise((resolve, reject) => {
-                        connection.query(userStatsQuery, [username, username, username, username, username, username], async (err, results, field) => {
-                            if (err) reject(err);
-                            else resolve(results);
-                        });
-
-                        const wins = results[0].wins;
-                        const losses = results[0].losses;
-                        const win_losses = results[0].win_losses;
-                        const loss_losses = results[0].loss_losses;
-
-                        // Winrate 계산
-                        const denominator = wins + losses + win_losses + loss_losses;
-                        const winrate = denominator !== 0 ? (wins + losses) / denominator : 0;
-
-                        // userinfo 테이블의 Winrate 값을 업데이트하는 쿼리
-                        const updateQuery = 'UPDATE userinfo SET Winrate = ? WHERE name = ?';
-
-                        new Promise((resolve, reject) => {
-                            connection.query(updateQuery, [winrate, username], (err, results, field) => {
-                                if (err) reject(err);
-                                else resolve();
-                            });
-                        });
-                    });
-                }
-
-                updateWinrate(challenger);
-                updateWinrate(contender);
-
                 return res.status(200).json({
                     status: "ok",
                     message: "매치 결과 업데이트 완료"
                 })
             })
+
+            
         })
     }
     catch(e){
