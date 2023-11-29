@@ -305,10 +305,10 @@ router.post('/result',async(req,res)=>{
             const SQL_array = [];
 
             if(score_challenger===3){
-                SQL_array.push(challenger, contender, score_challenger, score_contender);
+                SQL_array.push(challenger, contender, score_challenger, score_contender ,challenge_id);
             }
             else{
-                SQL_array.push(contender, challenger, score_contender, score_challenger);
+                SQL_array.push(contender, challenger, score_contender, score_challenger,challenge_id);
             }
 
             const SQL_UpdateMatch = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
