@@ -49,7 +49,7 @@ router.get('/info/:id',async(req,res)=>{
                     "password": results[0].password,
                     "champion": results[0].champion,
                     "tier": results[0].tier,
-                    "winrate": results[0].winrate
+                    "winrate": results[0].winrate + "%"
                 })
             }
             //해당하는 사용자가 없는 경우 에러 처리
