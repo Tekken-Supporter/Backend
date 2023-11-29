@@ -141,7 +141,7 @@ router.route('/review')//review 기능 CRUD
         const creationTime = new Date();
         const modifiedTime = new Date();
     
-        const SQL = "INSERT INTO review (c_name, id, reviewData, CreationTime, modifiedTime) values (?,?,?,?,?);";
+        const SQL = "INSERT INTO review (c_name, id, reviewData, creationTime, modifiedTime) values (?,?,?,?,?);";
         const connection = db.return_connection();//DB 연결용 connection 변수 선언
     
         connection.query(SQL,[c_name,id,reviewData, creationTime, modifiedTime],function(err,results,field){
