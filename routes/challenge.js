@@ -54,12 +54,21 @@ router.get('/name/:id',async(req,res)=>{
                             "detail": err.toString()
                         })
                     }
-                    const namelist = results[0].name.split(',');
-                    return res.status(200).json({
-                        status: "ok",
-                        message: "챌린지 신청 가능 목록",
-                        namelist: namelist
-                    })
+                    if(results[0].name.length !== undefined){
+                        const namelist = results[0].name.split(',');
+                        return res.status(200).json({
+                            status: "ok",
+                            message: "챌린지 신청 가능 목록",
+                            namelist: namelist
+                        })
+                    }
+                    else{
+                        return res.status(200).json({
+                            status: "ok",
+                            message: "챌린지 신청 가능 목록",
+                            namelist: []
+                        })
+                    }
                 })
             }
         })
@@ -357,37 +366,40 @@ router.post('/result',async(req,res)=>{
             updateWinrate(contender);
 
             
-            //티어 변동
-            const SQL_Tier = "select tier, name from userinfo where name = ? or name = ?;";
-            
-            connection.query(SQL_Tier,[challenger,contender],function(err,results,field){
-                if(err){
-                    console.error(err);
-                    return res.status(400).json({
-                        "type": "/errors/incorrect-SQL-pass",
-                        "title": "Incorrect query or SQL disconnect.",
-                        "status": 400,
-                        "detail": err.toString()
-                    })
-                }
-                
-                if(results[0].name===challenger){
-                    const tier_challenger = results[0].tier;
-                    const tier_contender = results[1].tier;
+            if(score_challenger === 3){
+                //티어 변동
+                const SQL_Tier = "select tier, name from userinfo where name = ? or name = ?;";
+                            
+                connection.query(SQL_Tier,[challenger,contender],function(err,results,field){
+                    if(err){
+                        console.error(err);
+                        return res.status(400).json({
+                            "type": "/errors/incorrect-SQL-pass",
+                            "title": "Incorrect query or SQL disconnect.",
+                            "status": 400,
+                            "detail": err.toString()
+                        })
+                    }
                     
-                    const SQL_SWAP = "update userinfo set tier = ? where name = ?;";
-                    connection.query(SQL_SWAP,[tier_challenger,contender],function(err,results,field){});
-                    connection.query(SQL_SWAP,[tier_contender,challenger],function(err,results,field){});
-                }
-                else{
-                    const tier_challenger = results[1].tier;
-                    const tier_contender = results[0].tier;
+                    if(results[0].name===challenger){
+                        const tier_challenger = results[0].tier;
+                        const tier_contender = results[1].tier;
+                        
+                        const SQL_SWAP = "update userinfo set tier = ? where name = ?;";
+                        connection.query(SQL_SWAP,[tier_challenger,contender],function(err,results,field){});
+                        connection.query(SQL_SWAP,[tier_contender,challenger],function(err,results,field){});
+                    }
+                    else{
+                        const tier_challenger = results[1].tier;
+                        const tier_contender = results[0].tier;
 
-                    const SQL_SWAP = "update userinfo set tier = ? where name = ?;";
-                    connection.query(SQL_SWAP,[tier_challenger,contender],function(err,results,field){});
-                    connection.query(SQL_SWAP,[tier_contender,challenger],function(err,results,field){});
-                }
-            })
+                        const SQL_SWAP = "update userinfo set tier = ? where name = ?;";
+                        connection.query(SQL_SWAP,[tier_challenger,contender],function(err,results,field){});
+                        connection.query(SQL_SWAP,[tier_contender,challenger],function(err,results,field){});
+                    }
+                })
+            }
+            
             
 
             const SQL_UpdateMatch = "update matches set winner = ?, loser = ?, winscore = ?,losescore = ? where match_id = ?;";
