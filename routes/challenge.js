@@ -362,9 +362,6 @@ router.post('/result',async(req,res)=>{
                 });
             }
 
-            updateWinrate(challenger);
-            updateWinrate(contender);
-
             
             if(score_challenger === 3){
                 //티어 변동
@@ -414,6 +411,9 @@ router.post('/result',async(req,res)=>{
                         "detail": err.toString()
                     })
                 }
+
+                updateWinrate(challenger);
+                updateWinrate(contender);
 
                 return res.status(200).json({
                     status: "ok",
