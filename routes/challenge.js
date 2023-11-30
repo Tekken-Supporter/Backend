@@ -42,9 +42,9 @@ router.get('/name/:id',async(req,res)=>{
             else{
                 const tierlist = ["Current_King", "Tier1", "Tier2", "Tier3", "Tier4", "Zate_Keeper"];
             
-                const SQL2 = "Select group_concat(name) as name from userinfo where tier = ?;";
+                const SQL2 = "Select group_concat(name) as name from userinfo where tier = ? or tier = ?;";
 
-                connection.query(SQL2,[tierlist[tierlist.indexOf(tier)-1]],function(err,results,field){
+                connection.query(SQL2,[tierlist[tierlist.indexOf(tier)-1],tier],function(err,results,field){
                     if(err){
                         console.error(err);
                         return res.status(400).json({
