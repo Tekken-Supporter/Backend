@@ -32,7 +32,7 @@ router.get('/name/:id',async(req,res)=>{
 
             const tier = results[0].tier;
 
-            if(tier === "Current_King"){
+            if(tier === "Current King"){
                 return res.status(200).json({
                     status: "ok",
                     message: "챔피언은 방어전 수락만 가능합니다.",
@@ -40,7 +40,7 @@ router.get('/name/:id',async(req,res)=>{
                 });
             }
             else{
-                const tierlist = ["Current_King", "Tier1", "Tier2", "Tier3", "Tier4", "Zate_Keeper"];
+                const tierlist = ["Current King", "Tier1", "Tier2", "Tier3", "Tier4", "Zate Keeper"];
             
                 const SQL2 = "Select group_concat(name) as name from userinfo where tier = ? or tier = ?;";
 
