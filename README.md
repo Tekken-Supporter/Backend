@@ -149,4 +149,30 @@
 
 ## 아키텍쳐
 
-### 디렉토리 구조
+### IA 구조
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/dc488ac2-40dc-40c9-8426-c84b12ce0b5d">
+
+### 웹 애플리케이션 아키텍처
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/e099197c-8fc1-4458-89de-33d6612a9b6f">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/0c868bf7-3dfb-4223-81c2-169d770fdec5">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/2a1d56f7-2388-44c1-9fd5-f1e207b0d2b1">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/d020915b-28ac-4341-a950-11937071ed45">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/da270e7b-b50c-44a0-b13e-6afc2e822c87">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/1c17e483-0ac2-4e28-b43e-c1a052be3122">
+<br><br><br>
+
+<img width="640" alt="image" src="https://github.com/Tekken-Supporter/Frontend/assets/109906670/13149fd5-0656-40ec-ba66-9736186cf20b">
+<br><br><br>
+
