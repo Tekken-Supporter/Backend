@@ -25,9 +25,9 @@
 
 | Instance | SSH host |
 | --- | --- |
-| Backend | http://34.168.80.42:3000/ |
+| Backend | http://34.127.90.191:3000/ |
 | Database | http://35.197.33.29:3306 |
-| Frontend | http://34.168.80.42:3000/ |
+| Frontend | http://34.127.90.191:3000/ |
 
 ## 팀 소개
 
